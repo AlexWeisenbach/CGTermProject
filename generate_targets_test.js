@@ -6,9 +6,9 @@ var gl;
 var maxNumTargets = 5;
 var currentTargets = maxNumTargets;
 
-var index = 102*maxNumTargets*8;
-
-
+var index = 102*maxNumTargets;
+var targetRadius = 0.1;
+var currentIndex = 0;
 
 window.onload = function init() {
 	canvas = document.getElementById("gl-canvas");
@@ -22,31 +22,39 @@ window.onload = function init() {
 
 	var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, index, gl.STATIC_DRAW);
+    
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
+    var targetPoints = [];
     
 	for(var x = 0; x < maxNumTargets; x++)
 	{
-		let randomX = Math.random() * canvas.width;
-		let randomY = Math.random() * canvas.height;
-		var center = vec2(randomX, randomY);
+		let randomX = Math.random() - Math.random();
+		let randomY = Math.random() - Math.random();
+		var center = vec3(randomX, randomY, 0);
 		//let randomZ = Math.random() * 20;
-		var points = [center];
-		for(var i = 0; i <= 100; i++)
-		{
-			points.push(vec2(center + vec2(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200))));
-		}
-
+		//var points = [center];
+		targetPoints.push(center);
+		console.log(center);
 		gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (x/5) * index, flatten(points));
+		for(var i = 0.0; i <= 100.0; i+=1.0)
+		{
+
+			targetPoints.push(vec3(center[0] + targetRadius * Math.cos(i*2.0*Math.PI/100.0), center[1] + targetRadius * Math.sin(i*2.0*Math.PI/100.0), center[2]));
+			//points.push(center + vec3(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200), 0));
+
+		}
+		//console.log(points.length);
+		//console.log(points.length * 5);
+		//gl.bufferSubData(gl.ARRAY_BUFFER, 12 * 101 * x, flatten(points));
+        
 	}
 
 
-
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(targetPoints), gl.STATIC_DRAW);
 
 
 	render();
@@ -57,7 +65,10 @@ window.onload = function init() {
 function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays( gl.TRIANGLE_FAN, 0, index);
-
+    for(var i = 0; i < maxNumTargets; i++){
+    	gl.drawArrays(gl.TRIANGLE_FAN, i * index/maxNumTargets, index/maxNumTargets)
+    }
+    //gl.drawArrays( gl.TRIANGLE_FAN, 0, index);
+   // console.log(index);
     window.requestAnimFrame(render);
 }
