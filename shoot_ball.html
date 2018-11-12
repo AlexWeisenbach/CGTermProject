@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+
+void
+main()
+{
+	
+
+    gl_Position = vPosition;
+   
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+void
+main()
+{
+	
+    gl_FragColor = vec4( 1, 0, 1, 1 );
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="shoot_ball.js"></script>
+</head>
+
+<body>
+	<!--x rotation in degrees: 0 <input id="x-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>
+	y rotation in degrees: 0 <input id="y-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>
+	z rotation in degrees: 0 <input id="z-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>-->
+	<button type="button">Fire!</button> 
+	<canvas id="gl-canvas" width="512" height="512">
+	Oops ... your browser doesn't support the HTML5 canvas element
+	</canvas>
+</body>
+</html>

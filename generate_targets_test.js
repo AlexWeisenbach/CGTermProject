@@ -7,7 +7,7 @@ var maxNumTargets = 5;
 var currentTargets = maxNumTargets;
 
 var index = 102*maxNumTargets;
-var targetRadius = 0.2;
+var targetRadius = 0.1;
 var currentIndex = 0;
 
 window.onload = function init() {
@@ -40,10 +40,10 @@ window.onload = function init() {
 		targetPoints.push(center);
 		console.log(center);
 		gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
-		for(var i = 0; i <= 100; i++)
+		for(var i = 0.0; i <= 100.0; i+=1.0)
 		{
 
-			targetPoints.push(center + targetRadius * vec3(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200), 0));
+			targetPoints.push(vec3(center[0] + targetRadius * Math.cos(i*2.0*Math.PI/100.0), center[1] + targetRadius * Math.sin(i*2.0*Math.PI/100.0), center[2]));
 			//points.push(center + vec3(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200), 0));
 
 		}
@@ -65,7 +65,10 @@ window.onload = function init() {
 function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays( gl.TRIANGLE_FAN, 0, index);
+    for(var i = 0; i < maxNumTargets; i++){
+    	gl.drawArrays(gl.TRIANGLE_FAN, i * index/maxNumTargets, index/maxNumTargets)
+    }
+    //gl.drawArrays( gl.TRIANGLE_FAN, 0, index);
    // console.log(index);
     window.requestAnimFrame(render);
 }
