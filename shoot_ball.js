@@ -3,8 +3,16 @@ var gl;
 var points;
 var vertices=[];
 
-var radius = 0.5;
+var radius = 0.2;
 var verticesLength;
+
+var maxZ = 400;
+
+var vel = vec3(0, 0.1, 0.2);
+
+var gravity = vec3(0, -0.01, 0);
+
+var vBuffer;
 
 window.onload = function init()
 {
@@ -36,10 +44,11 @@ window.onload = function init()
     
     // Load the data into the GPU
     
-    var bufferId = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
+    vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, vertices.length * 12, gl.STREAM_DRAW );
 
+    
     // Associate out shader variables with our data buffer
     
     var vPosition = gl.getAttribLocation( program, "vPosition" );
@@ -47,10 +56,29 @@ window.onload = function init()
     gl.enableVertexAttribArray( vPosition );
     verticesLength = vertices.length;
 
-    render();
+
+    var maxZLoc = gl.getUniformLocation( program, "maxZ" );
+
+    gl.uniform1f(maxZLoc, maxZ);
+
+    runPhysics();
 
 
 };
+
+
+
+function runPhysics(){
+	for(var i = 0; i < verticesLength; i++){
+    	vertices[i] = add(vertices[i], vel);
+    }
+    vel = add(vel, gravity);
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(vertices));
+    
+    
+    render();
+}
 
 
 
@@ -58,10 +86,8 @@ window.onload = function init()
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
-    //gl.uniform1f(xRotationLoc, x_rotation);
-   // gl.uniform1f(yRotationLoc, y_rotation);
-   // gl.uniform1f(zRotationLoc, z_rotation);
     
     gl.drawArrays( gl.TRIANGLE_FAN, 0, verticesLength );
+    window.requestAnimFrame(runPhysics);
 }
 
