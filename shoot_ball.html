@@ -24,7 +24,7 @@ void
 main()
 {
 	
-    gl_FragColor = vec4( 1, 0, 1, 1 );
+    gl_FragColor = vec4( 0, 1, 0, 1 );
 }
 </script>
 
@@ -36,7 +36,8 @@ main()
 
 <body>
 	
-	<button type="button">Fire!</button> 
+	<button type="button" id="fireButton" >Fire!</button> <br>
+	Power <input id="power" type="range" min="0.01" max="1" step="0.01" value="0.01" /> <br>
 	<canvas id="gl-canvas" width="512" height="512">
 	Oops ... your browser doesn't support the HTML5 canvas element
 	</canvas>
