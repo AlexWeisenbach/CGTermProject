@@ -3,7 +3,7 @@
 var canvas;
 var gl;
 
-var maxNumTargets = 5;
+var maxNumTargets = 1;
 var currentTargets = maxNumTargets;
 
 var index = 102*maxNumTargets;
@@ -32,10 +32,12 @@ window.onload = function init() {
     
 	for(var x = 0; x < maxNumTargets; x++)
 	{
-		let randomX = Math.random() - Math.random();
-		let randomY = Math.random() - Math.random();
-		var center = vec3(randomX, randomY, 0);
-		//let randomZ = Math.random() * 20;
+		let randomX = (Math.random() * 2) - 1;
+		let randomY = (Math.random() * 2) - 1;
+		//let randomZ = Math.random() * (maxZ - 1) + 1;
+		let randomZ = Math.random() * 19 + 1;
+		var center = vec4(randomX*randomZ, randomY*randomZ, randomZ, randomZ);
+		
 		//var points = [center];
 		targetPoints.push(center);
 		console.log(center);
@@ -43,7 +45,8 @@ window.onload = function init() {
 		for(var i = 0.0; i <= 100.0; i+=1.0)
 		{
 
-			targetPoints.push(vec3(center[0] + targetRadius * Math.cos(i*2.0*Math.PI/100.0), center[1] + targetRadius * Math.sin(i*2.0*Math.PI/100.0), center[2]));
+			//targetPoints.push(vec3(center[0] + targetRadius * Math.cos(i*2.0*Math.PI/100.0), center[1] + targetRadius * Math.sin(i*2.0*Math.PI/100.0), center[2]));
+			targetPoints.push(vec4(center[0] + (targetRadius* Math.cos(i*2.0*Math.PI/100.0) /** center[2]*/),  center[1] + (targetRadius * Math.sin(i*2.0*Math.PI/100.0) /** center[2]*/), center[2], center[2]));
 			//points.push(center + vec3(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200), 0));
 
 		}
