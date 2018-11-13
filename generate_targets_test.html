@@ -1,44 +1,30 @@
-
 <!DOCTYPE html>
 <html>
-
-<style>
-select{
-	float:left
-}
-</style>
+<head>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-
 attribute vec4 vPosition;
-attribute vec4 vColor;
-attribute float velocity;
 
-varying vec4 fColor;
-//varying float distance;
+uniform float maxZ;
 
 void
 main()
 {
-	//distance = distance + velocity;
-	//gl_Position.x = vPosition.x + distance;
-	//gl_Position.y = vPosition.y + distance;
-    //gl_Position.z = vPosition.z;
-    //gl_Position.w = 1.0;
-    gl_Position = vPosition;
-    fColor = vColor;
+    
+
+    gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, vPosition.z);
+   
 }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
-
 precision mediump float;
 
-varying vec4 fColor;
 void
 main()
 {
-    gl_FragColor = vec4( 1, 0, 1, 1 );;
+    
+    gl_FragColor = vec4( 0, 1, 0, 1 );
 }
 </script>
 
@@ -46,60 +32,14 @@ main()
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
 <script type="text/javascript" src="generate_targets_test.js"></script>
+</head>
 
 <body>
-<canvas id="gl-canvas" width="512" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+    
+    <button type="button" id="fireButton" >Fire!</button> <br>
+    Power <input id="power" type="range" min="0.01" max="1" step="0.01" value="0.01" /> <br>
+    <canvas id="gl-canvas" width="512" height="512">
+    Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
 </body>
-
-<div>
-<select id = "vert1menu" size = "7">
-
-    <option value = "0">Black</option>
-    <option value = "1">Red</option>
-    <option value = "2">Yellow</option>
-    <option value = "3">Green</option>
-    <option value = "4">Blue</option>
-    <option value = "5">Magenta</option>
-    <option value = "6">Cyan</option>
-</select>
-</div>
-
-<div>
-<select id = "vert2menu" size = "7">
-    <option value = "0">Black</option>
-    <option value = "1">Red</option>
-    <option value = "2">Yellow</option>
-    <option value = "3">Green</option>
-    <option value = "4">Blue</option>
-    <option value = "5">Magenta</option>
-    <option value = "6">Cyan</option>
-</select>
-</div>
-
-<div>
-<select id = "vert3menu" size = "7">
-    <option value = "0">Black</option>
-    <option value = "1">Red</option>
-    <option value = "2">Yellow</option>
-    <option value = "3">Green</option>
-    <option value = "4">Blue</option>
-    <option value = "5">Magenta</option>
-    <option value = "6">Cyan</option>
-</select>
-</div>
-
-<div>
-<input type = "range" min = "-100" max = "100"	value = "0" class = "slider" id = "vert1slider">
-</div>
-
-<div>
-<input type = "range" min = "-100" max = "100"	value = "0" class = "slider" id = "vert2slider">
-</div>
-
-<div>
-<input type = "range" min = "-100" max = "100"	value = "0" class = "slider" id = "vert3slider">
-</div>
-
 </html>
