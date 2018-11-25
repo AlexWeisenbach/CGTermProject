@@ -17,7 +17,7 @@ var maxZ = 50;
 
 var velocities = [];
 
-var initVel = vec3(0, 0.5, 1);
+var initVel = 1.1;
 
 var gravity = vec3(0, -0.01, 0);
 
@@ -40,8 +40,17 @@ window.onload = function init()
     //  Configure WebGL
     //
     document.getElementById("fireButton").onclick = function(){
+
     	var power = document.getElementById("power").value;
-		velocities.push(vec3(power * initVel[0], power * initVel[1], power * initVel[2]));
+    	var angleY = document.getElementById("angleY").value;
+    	var angleX = document.getElementById("angleX").value;
+    	var velMagnitude = initVel * power;
+    	var xVel = velMagnitude * Math.sin(radians(angleY)) * Math.sin(radians(angleX));
+    	var yVel = velMagnitude * Math.cos(radians(angleX));
+    	var zVel = velMagnitude * Math.cos(radians(angleY)) * Math.sin(radians(angleX));
+
+    	
+		velocities.push(vec3(xVel, yVel, zVel));
 		vertices.push(vec3(0, 0, 0));
 		for(var i = 0.0; i <= pointsAroundCircle; i += 1.0){
 	        vertices.push(vec3(radius * Math.cos(i * (2.0 * Math.PI)/100.0), radius * Math.sin(i * (2.0 * Math.PI)/100.0), 0));
