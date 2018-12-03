@@ -71,7 +71,8 @@ window.onload = function init() {
 		//	targetPoints.push(vec3(center[0] + (targetRadius* Math.cos(i*2.0*Math.PI/100.0) /** center[2]*/),  center[1] + (targetRadius * Math.sin(i*2.0*Math.PI/100.0) /** center[2]*/), center[2]));
 			//points.push(center + vec3(3*Math.cos(i*2*Math.PI/200), 3*Math.sin(i*2*Math.PI/200), 0));
 
-		//} 
+		//}
+
 
 		targetPoints.push(vec3(center[0] - targetRadius, center[1] + targetRadius, center[2]));
 		targetPoints.push(vec3(center[0] + targetRadius, center[1] + targetRadius, center[2]));
@@ -88,6 +89,22 @@ window.onload = function init() {
 		//gl.bufferSubData(gl.ARRAY_BUFFER, 12 * 101 * x, flatten(points));
         
 	}
+	//console.log("Let's try this " + Object.values(targetPoints[0])[2]);
+
+	/*console.log("Now printing the unsorted points:")
+	for(let x = 0; x < targetPoints.length; x++)
+	{
+		console.log(targetPoints[x]);
+	}
+
+	console.log("Now printing the sorted points:")
+
+	targetPoints.sort(compareZVals);
+	for(let x = 0; x < targetPoints.length; x++)
+	{
+		console.log(targetPoints[x]);
+	}*/
+	targetPoints.sort(compareZVals);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(targetPoints), gl.STATIC_DRAW);
@@ -162,4 +179,14 @@ function loadTexture(gl, url) {
 
 function isPowerOf2(value) {
   return (value & (value - 1)) == 0;
+}
+
+function compareZVals(a,b){
+	let aVal = Object.values(a)[2];
+	let bVal = Object.values(b)[2];
+	if(aVal > bVal)
+		return -1;
+	else if(aVal < bVal)
+		return 1;
+	else return 0;
 }
