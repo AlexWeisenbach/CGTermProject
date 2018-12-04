@@ -14,7 +14,7 @@ var maxBalls = 500;
 
 var radius = 0.2;
 var ballIndex = 0;
-var maxZ = 50;
+var maxZ = 20;
 var velocities = [];
 var initVel = 1.1;
 var gravity = vec3(0, -0.01, 0);
@@ -23,7 +23,7 @@ var powerScale = 0.01;
 var pointsAroundCircle = 100;
 
 
-var maxNumTargets = 5;
+var maxNumTargets = 1;
 var currentTargets = maxNumTargets;
 var index = 4 * maxNumTargets;
 var targetRadius = 0.3;
@@ -31,6 +31,8 @@ var targetRadius = 0.3;
 var vBuffer;
 var texBuffer;
 
+var centerList = [];
+var check = 0;
 window.onload = function init()
 {
     
@@ -124,12 +126,17 @@ window.onload = function init()
 
 
 function initTargets(){
+
+  centerList = [];
+
 	for(var x = 0; x < maxNumTargets; x++){
 		let randomX = Math.random() - Math.random();
 		let randomY = Math.random() - Math.random();
 			
 		let randomZ = Math.random() * maxZ/2 + 1;
 		var center = vec3(randomX*randomZ, randomY*randomZ, randomZ);
+    centerList.push(center);
+
 		targetVertices.push(vec3(center[0] - targetRadius, center[1] + targetRadius, center[2]));
 		targetVertices.push(vec3(center[0] + targetRadius, center[1] + targetRadius, center[2]));
 		targetVertices.push(vec3(center[0] - targetRadius, center[1] - targetRadius, center[2]));
@@ -160,6 +167,34 @@ function runPhysics(){
 			
 		}
     }
+
+    if(ballVertices.length > 0)
+    {
+      let ballCenter = ballVertices[pointsAroundCircle + 1];
+      for(let x = 0; x < centerList.length; x++)
+      {
+       let a = centerList[x][0] - ballCenter[0];
+       let b = centerList[x][1] - ballCenter[1];
+       //console.log("distance to target " + x + ": " + Math.sqrt(a * a + b * b));
+       //console.log(ballCenter[2]);
+       //console.log(centerList[x][2]);
+       //console.log("z dif is " + (ballCenter[2] - centerList[x][2]));
+       if(Math.sqrt(a * a + b * b) < (radius + targetRadius) && Math.abs(ballCenter[2] - centerList[x][2]) <= .5)//.5 is arbitrary, but feels good from testing
+       {
+          targetVertices[x*4] = vec3(5,5,5);
+          targetVertices[x*4 + 1] = vec3(5,5,5);
+          targetVertices[x*4 + 2] = vec3(5,5,5);
+          targetVertices[x*4 + 3] = vec3(5,5,5);//basically just sets this target to a place off screen
+          currentTargets--;
+          console.log("Hit! " + currentTargets + " remaining");
+          if(currentTargets == 0)
+          {
+            currentTargets = maxNumTargets;
+            initTargets();
+          }
+       }
+      }
+    }
     
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer );
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(ballVertices));
@@ -168,6 +203,10 @@ function runPhysics(){
     gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(ballUVs));
     gl.bufferSubData(gl.ARRAY_BUFFER, ballUVs.length * 8, flatten(targetUVs));
+
+
+
+    
     
     render();
 };
