@@ -4,15 +4,18 @@
 
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
-
+attribute vec2 vTextureCoord;
 uniform float maxZ;
+
+varying highp vec2 fragTextureCoord;
 
 void
 main()
 {
 	
 
-    gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, vPosition.z);
+    fragTextureCoord = vTextureCoord;
+    gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z * (vPosition.z/maxZ), vPosition.z);
    
 }
 </script>
@@ -20,11 +23,29 @@ main()
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
 
+varying highp vec2 fragTextureCoord;
+uniform sampler2D smplr;
+
 void
 main()
 {
-	
-    gl_FragColor = vec4( 0, 1, 0, 1 );
+	if(fragTextureCoord.x < -0.5){
+    	gl_FragColor = vec4( 0, 1, 0, 1 );
+	}
+	else
+	{
+	    vec4 col = texture2D(smplr, fragTextureCoord);
+	    
+
+	    if(col.x == 1.0 && col.y == 1.0 && col.z == 1.0)
+	    {
+	    	discard;
+	    }
+	    else
+	    {
+	    	gl_FragColor = col;
+	    }
+	}
 }
 </script>
 

@@ -6,6 +6,8 @@ var gl;
 var maxNumTargets = 5;
 var currentTargets = maxNumTargets;
 
+var maxZ = 50;
+
 var index = 4*maxNumTargets;
 var targetRadius = .3;
 var currentIndex = 0;
@@ -19,11 +21,13 @@ window.onload = function init() {
 	var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    gl.depthMask(true);
-
-    gl.enable(gl.BLEND);
+    /*gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
+	*/
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthMask(true);
+    gl.depthFunc(gl.LEQUAL);
+    gl.depthRange(0.0, 1.0);
 
 	var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -48,6 +52,10 @@ window.onload = function init() {
     const samplerLoc = gl.getUniformLocation(program, "smplr");
     gl.uniform1i(samplerLoc, 0);
 
+    var maxZLoc = gl.getUniformLocation( program, "maxZ" );
+
+    gl.uniform1f(maxZLoc, maxZ);
+
     var targetPoints = [];
 
     var texturePoints = [];
@@ -57,7 +65,7 @@ window.onload = function init() {
 		let randomX = (Math.random() * 2) - 1;
 		let randomY = (Math.random() * 2) - 1;
 		//let randomZ = Math.random() * (maxZ - 1) + 1;
-		let randomZ = (Math.random() * 30)/10 + 1;
+		let randomZ = (Math.random() * 3) + 1;
 		var center = vec3(randomX*randomZ, randomY*randomZ, randomZ);
 		
 		//var points = [center];
@@ -104,7 +112,7 @@ window.onload = function init() {
 	{
 		console.log(targetPoints[x]);
 	}*/
-	targetPoints.sort(compareZVals);
+	//targetPoints.sort(compareZVals);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(targetPoints), gl.STATIC_DRAW);
