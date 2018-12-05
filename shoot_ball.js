@@ -23,7 +23,7 @@ var powerScale = 0.01;
 var pointsAroundCircle = 100;
 
 
-var maxNumTargets = 1;
+var maxNumTargets = 2;
 var currentTargets = maxNumTargets;
 var index = 4 * maxNumTargets;
 var targetRadius = 0.3;
@@ -129,7 +129,10 @@ function initTargets(){
 
   centerList = [];
 
+  targetVertices = [];
+  
 	for(var x = 0; x < maxNumTargets; x++){
+
 		let randomX = Math.random() - Math.random();
 		let randomY = Math.random() - Math.random();
 			
@@ -181,13 +184,13 @@ function runPhysics(){
        //console.log("z dif is " + (ballCenter[2] - centerList[x][2]));
        if(Math.sqrt(a * a + b * b) < (radius + targetRadius) && Math.abs(ballCenter[2] - centerList[x][2]) <= .5)//.5 is arbitrary, but feels good from testing
        {
-          targetVertices[x*4] = vec3(5,5,5);
-          targetVertices[x*4 + 1] = vec3(5,5,5);
-          targetVertices[x*4 + 2] = vec3(5,5,5);
-          targetVertices[x*4 + 3] = vec3(5,5,5);//basically just sets this target to a place off screen
+          targetVertices[x*4] = vec3(25,25,25);
+          targetVertices[x*4 + 1] = vec3(25,25,25);
+          targetVertices[x*4 + 2] = vec3(25,25,25);
+          targetVertices[x*4 + 3] = vec3(25,25,25);//basically just sets this target to a place off screen
           currentTargets--;
           console.log("Hit! " + currentTargets + " remaining");
-          if(currentTargets == 0)
+          if(currentTargets === 0)
           {
             currentTargets = maxNumTargets;
             initTargets();
