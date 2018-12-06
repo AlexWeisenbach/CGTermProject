@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html>
+<style>
+select{
+	float:left
+}
+</style>
+
 <head>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
@@ -55,12 +61,21 @@ main()
 <script type="text/javascript" src="shoot_ball.js"></script>
 </head>
 
+
+
 <body>
-	
+	<div>
 	<button type="button" id="fireButton" >Fire!</button> <br>
 	Power <input id="power" type="range" min="0.01" max="1" step="0.01" value="0.01" /> <br>
 	Left-Right Rotation <input id="angleY" type="range" min="-50" max="50" step="1" value="0"/> <br>
 	Up-Down Rotation <input id="angleX" type="range" min="45" max="120" step="1" value="90"/> <br>
+    </div>
+
+    <div>
+    <p id="highScore"></p>
+    <p id="scoreCounter"></p>
+    <p id="missCounter"></p>
+    </div>
 	<canvas id="gl-canvas" width="512" height="512">
 	Oops ... your browser doesn't support the HTML5 canvas element
 	</canvas>

@@ -23,7 +23,7 @@ var powerScale = 0.01;
 var pointsAroundCircle = 100;
 
 
-var maxNumTargets = 2;
+var maxNumTargets = 5;
 var currentTargets = maxNumTargets;
 var index = 4 * maxNumTargets;
 var targetRadius = 0.3;
@@ -33,6 +33,13 @@ var texBuffer;
 
 var centerList = [];
 var check = 0;
+
+var scoreCounter;
+var actualScore = 0;
+var missCounter;
+var actualMissCount = 5;
+var highScore;
+var actualhighScore = 0;;
 window.onload = function init()
 {
     
@@ -51,7 +58,16 @@ window.onload = function init()
     gl.depthFunc(gl.LEQUAL);
     gl.depthRange(0.0, 1.0);
 
+    scoreCounter = document.getElementById("scoreCounter");
+    scoreCounter.innerHTML = "Score: " + actualScore;
 
+    missCounter = document.getElementById("missCounter");
+    missCounter.innerHTML = "Misses left: " + actualMissCount;
+
+    highScore = document.getElementById("highScore");
+    highScore.innerHTML = "High Score this session: " + actualhighScore;
+
+    
 
     document.getElementById("fireButton").onclick = function(){
 
@@ -118,6 +134,8 @@ window.onload = function init()
 
     gl.uniform1f(maxZLoc, maxZ);
 
+    alert("Use the sliders to aim a ball and hit the targets. Miss too many and you have to restart, but each target you hit gives you more chances. Try to score as many points as you can!");
+
     initTargets();
     runPhysics();
 
@@ -130,7 +148,7 @@ function initTargets(){
   centerList = [];
 
   targetVertices = [];
-  
+
 	for(var x = 0; x < maxNumTargets; x++){
 
 		let randomX = Math.random() - Math.random();
@@ -167,6 +185,22 @@ function runPhysics(){
 			ballUVs.splice((pointsAroundCircle + 2) * i, pointsAroundCircle + 2);
 			i--;
 			ballIndex--;
+      actualMissCount--;
+      missCounter.innerHTML = "Misses left: " + actualMissCount;
+      if(actualMissCount == 0)
+      {
+        if(actualScore > actualhighScore)
+        {
+          actualhighScore = actualScore;
+        }
+        alert("Out of misses! You got " + actualScore + " points this round.");
+        actualScore = 0;
+        scoreCounter.innerHTML = "Score: " + actualScore;
+        actualMissCount = 5;
+        missCounter.innerHTML = "Misses left: " + actualMissCount;
+        highScore.innerHTML = "High Score this session: " + actualhighScore;
+        initTargets();
+      }
 			
 		}
     }
@@ -190,6 +224,11 @@ function runPhysics(){
           targetVertices[x*4 + 3] = vec3(25,25,25);//basically just sets this target to a place off screen
           currentTargets--;
           console.log("Hit! " + currentTargets + " remaining");
+          actualScore++;
+          scoreCounter.innerHTML = "Score: " + actualScore;
+          actualMissCount = actualMissCount + 2;
+          missCounter.innerHTML = "Misses left: " + actualMissCount;
+
           if(currentTargets === 0)
           {
             currentTargets = maxNumTargets;
