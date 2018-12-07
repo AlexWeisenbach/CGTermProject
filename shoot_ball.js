@@ -200,42 +200,48 @@ function runPhysics(){
         missCounter.innerHTML = "Misses left: " + actualMissCount;
         highScore.innerHTML = "High Score this session: " + actualhighScore;
         initTargets();
-      }
+        }
 			
-		}
+		  }
+      else{
+        let ballCenter = ballVertices[(pointsAroundCircle + 2) * i];
+        for(let x = 0; x < centerList.length; x++)
+        {
+         let a = centerList[x][0] - ballCenter[0];
+         let b = centerList[x][1] - ballCenter[1];
+         let c = centerList[x][2] - ballCenter[2];
+         //console.log("distance to target " + x + ": " + Math.sqrt(a * a + b * b));
+         //console.log(ballCenter[2]);
+         //console.log(centerList[x][2]);
+         //console.log("z dif is " + (ballCenter[2] - centerList[x][2]));
+         if(Math.sqrt(a * a + b * b + c * c) < (radius + targetRadius)/* && Math.abs(ballCenter[2] - centerList[x][2]) <= .5*/)//.2 is arbitrary, but feels good from testing
+         {
+            centerList[x] = vec3 (25, 25, 1000);
+            targetVertices[x*4] = vec3(25,25,1000);
+            targetVertices[x*4 + 1] = vec3(25,25,1000);
+            targetVertices[x*4 + 2] = vec3(25,25,1000);
+            targetVertices[x*4 + 3] = vec3(25,25,1000);//basically just sets this target to a place off screen
+            currentTargets--;
+            console.log("Hit! " + currentTargets + " remaining");
+            actualScore++;
+            scoreCounter.innerHTML = "Score: " + actualScore;
+            actualMissCount = actualMissCount + 2;
+            missCounter.innerHTML = "Misses left: " + actualMissCount;
+
+            if(currentTargets === 0)
+            {
+              currentTargets = maxNumTargets;
+              initTargets();
+            }
+         }
+        }
+      }
     }
 
     if(ballVertices.length > 0)
     {
-      let ballCenter = ballVertices[pointsAroundCircle + 1];
-      for(let x = 0; x < centerList.length; x++)
-      {
-       let a = centerList[x][0] - ballCenter[0];
-       let b = centerList[x][1] - ballCenter[1];
-       //console.log("distance to target " + x + ": " + Math.sqrt(a * a + b * b));
-       //console.log(ballCenter[2]);
-       //console.log(centerList[x][2]);
-       //console.log("z dif is " + (ballCenter[2] - centerList[x][2]));
-       if(Math.sqrt(a * a + b * b) < (radius + targetRadius) && Math.abs(ballCenter[2] - centerList[x][2]) <= .5)//.5 is arbitrary, but feels good from testing
-       {
-          targetVertices[x*4] = vec3(25,25,25);
-          targetVertices[x*4 + 1] = vec3(25,25,25);
-          targetVertices[x*4 + 2] = vec3(25,25,25);
-          targetVertices[x*4 + 3] = vec3(25,25,25);//basically just sets this target to a place off screen
-          currentTargets--;
-          console.log("Hit! " + currentTargets + " remaining");
-          actualScore++;
-          scoreCounter.innerHTML = "Score: " + actualScore;
-          actualMissCount = actualMissCount + 2;
-          missCounter.innerHTML = "Misses left: " + actualMissCount;
 
-          if(currentTargets === 0)
-          {
-            currentTargets = maxNumTargets;
-            initTargets();
-          }
-       }
-      }
+      
     }
     
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer );
