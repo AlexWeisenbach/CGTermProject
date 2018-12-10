@@ -1,16 +1,28 @@
 <!DOCTYPE html>
 <html>
+<style>
+select{
+	float:left
+}
+</style>
+
 <head>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
+attribute vec2 vTextureCoord;
+uniform float maxZ;
+
+varying highp vec2 fragTextureCoord;
 
 void
 main()
 {
 	
 
-    gl_Position = vPosition;
+    fragTextureCoord = vTextureCoord;
+    //Divide the vertex by the z-coord to make simple perspective projection
+    gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z * (vPosition.z/maxZ), vPosition.z);
    
 }
 </script>
@@ -18,11 +30,30 @@ main()
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
 
+varying highp vec2 fragTextureCoord;
+uniform sampler2D smplr;
+
 void
 main()
 {
-	
-    gl_FragColor = vec4( 1, 0, 1, 1 );
+	//If the fragTextureCoords don't make sense, make the color green
+	if(fragTextureCoord.x < -0.5){
+    	gl_FragColor = vec4( 0, 1, 0, 1 );
+	}
+	else
+	{
+	    vec4 col = texture2D(smplr, fragTextureCoord);
+	    
+	    //Don't draw white so it is transparent
+	    if(col.x == 1.0 && col.y == 1.0 && col.z == 1.0)
+	    {
+	    	discard;
+	    }
+	    else
+	    {
+	    	gl_FragColor = col;
+	    }
+	}
 }
 </script>
 
@@ -32,11 +63,21 @@ main()
 <script type="text/javascript" src="shoot_ball.js"></script>
 </head>
 
+
+
 <body>
-	<!--x rotation in degrees: 0 <input id="x-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>
-	y rotation in degrees: 0 <input id="y-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>
-	z rotation in degrees: 0 <input id="z-rotation" type="range" min="0" max="360" step="1" value="0" /> 360 <br>-->
-	<button type="button">Fire!</button> 
+	<div>
+	<button type="button" id="fireButton" >Fire!</button> <br>
+	Power <input id="power" type="range" min="0.01" max="1" step="0.01" value="0.01" /> <br>
+	Left-Right Rotation <input id="angleY" type="range" min="-50" max="50" step="1" value="0"/> <br>
+	Up-Down Rotation <input id="angleX" type="range" min="45" max="120" step="1" value="90"/> <br>
+    </div>
+
+    <div>
+    <p id="highScore"></p>
+    <p id="scoreCounter"></p>
+    <p id="missCounter"></p>
+    </div>
 	<canvas id="gl-canvas" width="512" height="512">
 	Oops ... your browser doesn't support the HTML5 canvas element
 	</canvas>
