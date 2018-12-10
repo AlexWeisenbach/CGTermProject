@@ -57,6 +57,7 @@ window.onload = function init()
     gl.depthFunc(gl.LEQUAL);
     gl.depthRange(0.0, 1.0);
 
+    //Init score stuff
     scoreCounter = document.getElementById("scoreCounter");
     scoreCounter.innerHTML = "Score: " + actualScore;
 
@@ -156,13 +157,16 @@ function initTargets(){
 			
 		let randomZ = Math.random() * maxZ/2 + 1;
 		var center = vec3(randomX*randomZ, randomY*randomZ, randomZ);
+    //keep track of the centers for collision purposes
     centerList.push(center);
 
+    //Generate the four corners of the target (a square texture with transparent non-circle parts)
 		targetVertices.push(vec3(center[0] - targetRadius, center[1] + targetRadius, center[2]));
 		targetVertices.push(vec3(center[0] + targetRadius, center[1] + targetRadius, center[2]));
 		targetVertices.push(vec3(center[0] - targetRadius, center[1] - targetRadius, center[2]));
 		targetVertices.push(vec3(center[0] + targetRadius, center[1] - targetRadius, center[2]));
 
+    //Generate the texture coordinates for each vertice in order
 		targetUVs.push(vec2(0,1));
 		targetUVs.push(vec2(1,1));
 		targetUVs.push(vec2(0,0));
@@ -192,6 +196,7 @@ function runPhysics(){
   			ballIndex--;
         actualMissCount--;
         missCounter.innerHTML = "Misses left: " + actualMissCount;
+        //If out of misses, reset game state while saving the new high score if necessary
         if(actualMissCount == 0)
         {
           if(actualScore > actualhighScore)
@@ -217,7 +222,8 @@ function runPhysics(){
          let a = centerList[x][0] - ballCenter[0];
          let b = centerList[x][1] - ballCenter[1];
          let c = centerList[x][2] - ballCenter[2];
-         if(Math.sqrt(a * a + b * b + c * c) < (radius + targetRadius)/* && Math.abs(ballCenter[2] - centerList[x][2]) <= .5*/)//.2 is arbitrary, but feels good from testing
+         //Check if the center of the ball is within range of the center of the target
+         if(Math.sqrt(a * a + b * b + c * c) < (radius + targetRadius)/* && Math.abs(ballCenter[2] - centerList[x][2]) <= .5*/)
          {
             centerList[x] = vec3 (25, 25, 1000);
             targetVertices[x*4] = vec3(25,25,1000);
@@ -231,6 +237,7 @@ function runPhysics(){
             actualMissCount = actualMissCount + 2;
             missCounter.innerHTML = "Misses left: " + actualMissCount;
 
+            //If there are no remaining targets, spawn more
             if(currentTargets === 0)
             {
               currentTargets = maxNumTargets;
