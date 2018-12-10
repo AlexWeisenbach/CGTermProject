@@ -21,6 +21,7 @@ main()
 	
 
     fragTextureCoord = vTextureCoord;
+    //Divide the vertex by the z-coord to make simple perspective projection
     gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z * (vPosition.z/maxZ), vPosition.z);
    
 }
@@ -35,6 +36,7 @@ uniform sampler2D smplr;
 void
 main()
 {
+	//If the fragTextureCoords don't make sense, make the color green
 	if(fragTextureCoord.x < -0.5){
     	gl_FragColor = vec4( 0, 1, 0, 1 );
 	}
@@ -42,7 +44,7 @@ main()
 	{
 	    vec4 col = texture2D(smplr, fragTextureCoord);
 	    
-
+	    //Don't draw white so it is transparent
 	    if(col.x == 1.0 && col.y == 1.0 && col.z == 1.0)
 	    {
 	    	discard;

@@ -1,24 +1,22 @@
 
 var gl;
-var points;
 
 var targetVertices=[];
 var targetUVs = [];
 
+//Ball Arrays
 var ballVertices=[];
 var ballUVs = [];
+var velocities = [];
 
-
+//Ball constants
 var maxBalls = 500;
-
-
 var radius = 0.2;
 var ballIndex = 0;
 var maxZ = 20;
-var velocities = [];
+var minY = -50;
 var initVel = 1.1;
 var gravity = vec3(0, -0.01, 0);
-var vBuffer;
 var powerScale = 0.01;
 var pointsAroundCircle = 100;
 
@@ -28,6 +26,7 @@ var currentTargets = maxNumTargets;
 var index = 4 * maxNumTargets;
 var targetRadius = 0.3;
 
+//Buffers
 var vBuffer;
 var texBuffer;
 
@@ -68,7 +67,7 @@ window.onload = function init()
     highScore.innerHTML = "High Score this session: " + actualhighScore;
 
     
-
+    //Spawns a ball with the initial conditions given by the sliders
     document.getElementById("fireButton").onclick = function(){
 
     	var power = document.getElementById("power").value;
@@ -80,14 +79,14 @@ window.onload = function init()
     	var zVel = velMagnitude * Math.cos(radians(angleY)) * Math.sin(radians(angleX));
 
     	
-		velocities.push(vec3(xVel, yVel, zVel));
-		ballVertices.push(vec3(0, 0, 0));
-		ballUVs.push(vec2(-1, -1));
-		for(var i = 0.0; i <= pointsAroundCircle; i += 1.0){
-	        ballVertices.push(vec3(radius * Math.cos(i * (2.0 * Math.PI)/100.0), radius * Math.sin(i * (2.0 * Math.PI)/100.0), 0));
-	    	ballUVs.push(vec2(-1, -1));
-	    }
-	    ballIndex++;
+  		velocities.push(vec3(xVel, yVel, zVel));
+  		ballVertices.push(vec3(0, 0, 0));
+  		ballUVs.push(vec2(-1, -1));
+  		for(var i = 0.0; i <= pointsAroundCircle; i += 1.0){
+  	        ballVertices.push(vec3(radius * Math.cos(i * (2.0 * Math.PI)/100.0), radius * Math.sin(i * (2.0 * Math.PI)/100.0), 0));
+  	    	ballUVs.push(vec2(-1, -1));
+  	    }
+  	    ballIndex++;
     };
   
 
@@ -104,14 +103,10 @@ window.onload = function init()
     vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, maxNumTargets * maxBalls * (pointsAroundCircle + 2) * 12, gl.STREAM_DRAW );
-
-    
-    // Associate out shader variables with our data buffer
     
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-
 
     texBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
@@ -143,14 +138,19 @@ window.onload = function init()
 };
 
 
+//Initialize the targets and reset the balls
 function initTargets(){
 
   centerList = [];
-
   targetVertices = [];
 
-	for(var x = 0; x < maxNumTargets; x++){
+  ballVertices=[];
+  ballUVs = [];
+  velocities = [];
+  ballIndex = 0;
 
+	for(var x = 0; x < maxNumTargets; x++){
+    //Set to random position
 		let randomX = Math.random() - Math.random();
 		let randomY = Math.random() - Math.random();
 			
@@ -171,38 +171,45 @@ function initTargets(){
 };
 
 
+//The the code to run in each update
 function runPhysics(){
 	for(var i = 0; i < velocities.length; i++){
 
+      //Move the ball by its velocity
     	for(var j = 0; j < (pointsAroundCircle + 2); j++){
     		ballVertices[(pointsAroundCircle + 2) * i + j] = add(ballVertices[(pointsAroundCircle + 2) * i + j], velocities[i]);
     	}
+
+      //Add acceleration to the velocity
     	velocities[i] = add(velocities[i], gravity);
 
-    	if(ballVertices[(pointsAroundCircle + 2) * i][2] > maxZ){
-			velocities.splice(i, 1);
-			ballVertices.splice((pointsAroundCircle + 2) * i, pointsAroundCircle + 2);
-			ballUVs.splice((pointsAroundCircle + 2) * i, pointsAroundCircle + 2);
-			i--;
-			ballIndex--;
-      actualMissCount--;
-      missCounter.innerHTML = "Misses left: " + actualMissCount;
-      if(actualMissCount == 0)
-      {
-        if(actualScore > actualhighScore)
-        {
-          actualhighScore = actualScore;
-        }
-        alert("Out of misses! You got " + actualScore + " points this round.");
-        actualScore = 0;
-        scoreCounter.innerHTML = "Score: " + actualScore;
-        actualMissCount = 5;
+      //Check if the ball is out of bounds
+    	if(ballVertices[(pointsAroundCircle + 2) * i][2] > maxZ || ballVertices[(pointsAroundCircle + 2) * i][1] < minY){
+  			velocities.splice(i, 1);
+  			ballVertices.splice((pointsAroundCircle + 2) * i, pointsAroundCircle + 2);
+  			ballUVs.splice((pointsAroundCircle + 2) * i, pointsAroundCircle + 2);
+  			i--;
+  			ballIndex--;
+        actualMissCount--;
         missCounter.innerHTML = "Misses left: " + actualMissCount;
-        highScore.innerHTML = "High Score this session: " + actualhighScore;
-        initTargets();
+        if(actualMissCount == 0)
+        {
+          if(actualScore > actualhighScore)
+          {
+            actualhighScore = actualScore;
+          }
+          alert("Out of misses! You got " + actualScore + " points this round.");
+          actualScore = 0;
+          scoreCounter.innerHTML = "Score: " + actualScore;
+          actualMissCount = 5;
+          missCounter.innerHTML = "Misses left: " + actualMissCount;
+          highScore.innerHTML = "High Score this session: " + actualhighScore;
+          initTargets();
         }
 			
 		  }
+
+      //Check for collisions
       else{
         let ballCenter = ballVertices[(pointsAroundCircle + 2) * i];
         for(let x = 0; x < centerList.length; x++)
@@ -210,10 +217,6 @@ function runPhysics(){
          let a = centerList[x][0] - ballCenter[0];
          let b = centerList[x][1] - ballCenter[1];
          let c = centerList[x][2] - ballCenter[2];
-         //console.log("distance to target " + x + ": " + Math.sqrt(a * a + b * b));
-         //console.log(ballCenter[2]);
-         //console.log(centerList[x][2]);
-         //console.log("z dif is " + (ballCenter[2] - centerList[x][2]));
          if(Math.sqrt(a * a + b * b + c * c) < (radius + targetRadius)/* && Math.abs(ballCenter[2] - centerList[x][2]) <= .5*/)//.2 is arbitrary, but feels good from testing
          {
             centerList[x] = vec3 (25, 25, 1000);
@@ -238,12 +241,7 @@ function runPhysics(){
       }
     }
 
-    if(ballVertices.length > 0)
-    {
-
-      
-    }
-    
+    //Add the vertices to the buffers
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer );
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(ballVertices));
     gl.bufferSubData(gl.ARRAY_BUFFER, ballVertices.length * 12, flatten(targetVertices));
@@ -251,11 +249,6 @@ function runPhysics(){
     gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(ballUVs));
     gl.bufferSubData(gl.ARRAY_BUFFER, ballUVs.length * 8, flatten(targetUVs));
-
-
-
-    
-    
     render();
 };
 
@@ -264,10 +257,11 @@ function runPhysics(){
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-
+    //Draw each ball
     for(var i = 0; i < ballIndex; i++){
     	gl.drawArrays( gl.TRIANGLE_FAN, i * (pointsAroundCircle + 2), pointsAroundCircle + 2);
     }
+    //Draw each target
     for(var i = 0; i < maxNumTargets; i++){
     	gl.drawArrays(gl.TRIANGLE_STRIP, ballIndex * (pointsAroundCircle + 2) + i * 4, 4);
     }
